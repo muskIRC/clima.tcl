@@ -1,1 +1,2 @@
 # clima.tcl
+Autor: Blackshadow

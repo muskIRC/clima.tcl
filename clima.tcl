@@ -1,25 +1,25 @@
 #######################################################################################################
-## BlackWeather.tcl 1.1  (14/01/2020)  		          Copyright 2008 - 2020 @ WwW.TCLScripts.NET ##
+## BlackWeather.tcl 1.2  (25/05/2021)  			  		  Copyright 2008 - 2021 @ WwW.TCLScripts.NET ##
 ##                        _   _   _   _   _   _   _   _   _   _   _   _   _   _                      ##
 ##                       / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ / \                     ##
 ##                      ( T | C | L | S | C | R | I | P | T | S | . | N | E | T )                    ##
 ##                       \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/                     ##
 ##                                                                                                   ##
-##                                      Â® BLaCkShaDoW Production Â®                                   ##
+##                                      ® BLaCkShaDoW Production ®                                   ##
 ##                                                                                                   ##
 ##                                              PRESENTS                                             ##
-##									                           Â® ##
+##									                           ® ##
 ##########################################  BLACK WEATHER TCL   #######################################
-##									                             ##
+##									                           									     ##
 ##  DESCRIPTION: 							                             ##
-##  Displays real-time weather conditions, local time from any city in the world. 		     ##
+##  Displays real-time weather conditions, local time from any city in the world. 					 ##
 ##									                             ##
 ##  Supports US Zipcode, UK Postcode, Canada Postalcode or worldwide city name.                      ##
 ##									                             ##
 ##  Few of the available variable: max./min. and 'feels like' temperatures, wind speed,,local time   ##
-##                                                                                                   ##
+##                                                                     ##
 ##									                             ##
-##  ATTENTION: search does not support diacritic markst as: Ã¡, Ã©, Ã­, Ã³, Ãº, Ã¼, Ã±, Â¿, Â¡, etc.          ##
+##  ATTENTION: search does not support diacritic markst as: á, é, í, ó, ú, ü, ñ, ¿, ¡, etc.          ##
 ##									                             ##
 ##  Tested on Eggdrop v1.8.3 (Debian Linux 3.16.0-4-amd64) Tcl version: 8.6.6                        ##
 ##									                             ##
@@ -31,7 +31,7 @@
 ##									                             ##
 #######################################################################################################
 ##									                           									     ##
-##  INSTALLATION: 							                             ##
+##  INSTALLATION: 							                             							 ##
 ##     ++ http package is REQUIRED for this script to work.                           		     ##
 ##     ++ json package is REQUIRED for this script to work.                           		     ##
 ##     ++ Edit the BlackWeather.tcl script and place it into your /scripts directory,                ##
@@ -51,21 +51,29 @@
 ##     paypal.me/DanielVoipan = Please consider a donation. Thanks!                                  ##
 ##									                             ##
 #######################################################################################################
+##									                             ##
+##                           You want a customised TCL Script for your eggdrop?                      ##
+##                                Easy-peasy, just tell me what you need!                            ##
+##                I can create almost anything in TCL based on your ideas and donations.             ##
+##                  Email blackshadow@tclscripts.net or info@tclscripts.net with your                ##
+##                    request informations and I'll contact you as soon as possible.                 ##
+##									                             ##
+#######################################################################################################
 ##									                           									     ##
 ##  To activate: .chanset +weather | from BlackTools: .set #channel +weather                         ##
 ##                                                                                                   ##
-##  !w [?|help] - shows all available commands.                                                      ##
+##  !w [?|help] - shows all available commands.                                                  	 ##
 ##                                                                                                   ##
-##  !w [set] [nick|zipcode|city,state|city,state,country|airport]                       	     ##
+##  !w [set] [nick|zipcode|city,state|city,state,country|airport]                       		     ##
 ##                                                                                                   ##
 ##  !time [nick|zipcode|city,state|city,state,country|airport]                                       ##
 ##                                          - returns a default user local time.                     ##
 ##                                                                                                   ##
-##  !w version - shows the actual weather script version.                                  	     ##
+##  !w version - shows the actual weather script version.                                  	         ##
 ##                                                                                                   ##
 ##  Supports: US Zipcode, UK Postcode, Canada Postalcodes or worldwide city name.                    ##
 ##                                                                                                   ##
-##  ATTENTION: search does not support diacritic markst as: Ã¡, Ã©, Ã­, Ã³, Ãº, Ã¼, Ã±, Â¿, Â¡, etc.          ##
+##  ATTENTION: search does not support diacritic markst as: á, é, í, ó, ú, ü, ñ, ¿, ¡, etc.          ##
 ##                                                                                                   ##
 #######################################################################################################                                                                                                 ##
 #######################################################################################################
@@ -83,7 +91,7 @@
 ##   See the GNU General Public License for more details.                                            ##
 ##        (http://www.gnu.org/copyleft/library.txt)                                                  ##
 ##                                                                                                   ##
-##  			          Copyright 2008 - 2018 @ WwW.TCLScripts.NET                         ##
+##  			          Copyright 2008 - 2021 @ WwW.TCLScripts.NET              		             ##
 ##                                                                                                   ##
 #######################################################################################################
 #######################################################################################################
@@ -104,10 +112,12 @@
 set weather(cmd_char) "!"
 
 ###
-#Api key from http://api.weatherstack.com
-#
+#Api keys from http://api.weatherstack.com 
+#(works with multiple keys now)
 ###
-set weather(nr_id) "a45a4bc29ac5132de4f381a49008a16b"
+set weather(nr_id)  {
+"1bb5f63e36ef25f4c5f3aef28a86ae88"
+}
 
 ###
 #Default units type (m - metric, f - fahrenheit)
@@ -156,7 +166,7 @@ bind pubm - * weather:get
 	package require json
 
 if {![file exists $weather(user_file)]} {
-	set file [open $weather(user_file)w]
+	set file [open $weather(user_file) w]
 	close $file
 }
 
@@ -168,7 +178,7 @@ if {![channel get $chan weather]} {
 	set first_cmd [lindex [split $arg] 0]
 if {[string match -nocase "$weather(cmd_char)clima" $first_cmd]} {
 	set cmd_type 0
-} elseif {[string match -nocase "$weather(cmd_char)hora" $first_cmd]} {
+} elseif {[string match -nocase "$weather(cmd_char)time" $first_cmd]} {
 	set cmd_type 1
 } else { return }
 	set flood_protect [weather:flood:prot $chan $host]
@@ -284,9 +294,19 @@ switch [concat $units] {
 ###
 proc weather:getinfo {nick chan location units cmd_type} {
 	global weather
-	set data [weather:getdata $chan $location $units]
+if {![info exists weather(id_num)]} {
+	set weather(id_num) 0
+}
+	set data [weather:getdata $chan $location $units $weather(id_num)]
 	set error [weather:getjson "error" $data]
 if {$error != ""} {
+	incr weather(id_num)
+if {[lindex $weather(nr_id) $weather(id_num)] != ""} {
+	weather:getinfo $nick $chan $location $units $cmd_type
+	return
+	} else {
+	unset weather(id_num)
+}
 	set error_text [lindex $error 5]
 	weather:say $nick $chan [list $error_text] 6
 	return
@@ -304,9 +324,9 @@ if {[string equal -nocase $name $region] || $region == ""} {
 	set get_location [join [list $name $region $country] ", "]
 }
 	set timezone [lindex $location 11]
-	set get [catch {exec env TZ=$timezone date | tr -s " "} dat]
-	set dat [join [lreplace [split $dat " "] 4 4]]
-	set clock_scan [clock scan $dat -format "%a %b %e %H:%M:%S %Y"]
+	set get [catch {exec env TZ=$timezone date -R | tr -s " "} dat]
+	set dat [join [lreplace [split $dat " "] 5 5]]
+	set clock_scan [clock scan $dat -format "%a, %e %b %Y %H:%M:%S"]
 	set day [clock format $clock_scan -format %A]
 	set localtime [clock format $clock_scan -format "%d %b %Y %R"]
 if {$cmd_type == "1"} {
@@ -374,11 +394,12 @@ if {$read_location == ""} {
 }
 
 ###
-proc weather:getdata {chan location units} {
+proc weather:getdata {chan location units num} {
 	global weather black
-	set weatherlink "http://api.weatherstack.com/current?access_key=$weather(nr_id)&query=$location&units=$units"
+	set wid [lindex $weather(nr_id) $num]
+	set weatherlink "http://api.weatherstack.com/current?access_key=${wid}&query=$location&units=$units"
 	set ipq [http::config -useragent "lynx"]
-	set ipq [::http::geturl "$weatherlink"] 
+	set ipq [::http::geturl "$weatherlink" -timeout 10000] 
 	set data [http::data $ipq]
 	::http::cleanup $ipq
 	return $data
@@ -472,7 +493,7 @@ set weather(projectName) "BlackWeather"
 set weather(author) "BLaCkShaDoW"
 set weather(website) "wWw.TCLScriptS.NeT"
 set weather(email) "blackshadow\[at\]tclscripts.net"
-set weather(version) "v1.1"
+set weather(version) "v1.2"
 
 
 #http://wiki.tcl.tk/989
@@ -515,18 +536,18 @@ if {[string equal -nocase $enc_chan $chan] && [string match -nocase $host $read_
 	close $file
 }
 
-set grade_sign [encoding convertfrom "utf-8" "Â°"]
+set grade_sign [encoding convertfrom "utf-8" "°"]
 set black(weather.en.1) "\002%msg.1%\002 (%msg.2%) -- %msg.3% and %msg.4%$grade_sign C"
 set black(weather.en.2) "\002%msg.1%\002 (%msg.2%) -- %msg.3% and %msg.4%$grade_sign F"
 set black(weather.en.3) "\002%msg.1%\002 (%msg.2%) -- \002%msg.4%\002, %msg.3%"
-set black(weather.en.4) "La Temperatura Actual en: \002%msg.1%\002 es de:  %msg.3%$grade_sign C | \002SensaciÃ³n Termica\002: %msg.4%$grade_sign C | \002Humedad\002: %msg.5%% | \002Viento\002: %msg.7% km/h | \002PresiÃ³n AtmofÃ©rica\002: %msg.8%mb | \002Nubosidad\002: %msg.9%% |  \002LLuvia\002: %msg.12%% | \002Ãndice UV\002: %msg.10% | \002Tiempo De ObservaciÃ³n\002: %msg.11%"
+set black(weather.en.4) "\002%msg.1%\002 (%msg.2%) -- %msg.13% and %msg.3%$grade_sign C | \002Sensación térmica\002: %msg.4%$grade_sign C | \002Humedad\002: %msg.5%% | \002Velocidad del Viento\002: %msg.6% @ %msg.7% KPH | \002Presión atmosférica\002: %msg.8%mb | \002Nubes\002: %msg.9%% |  \002Posibilidad de lluvia\002: %msg.12%% | \002Índice UV\002: %msg.10% | \002última actualización\002: %msg.11%"
 set black(weather.en.5) "\002%msg.1%\002 (%msg.2%) -- %msg.13% and %msg.3%$grade_sign F | \002Feels Like\002: %msg.4%$grade_sign F | \002Humidity\002: %msg.5%% | \002Wind\002: %msg.6% @ %msg.7% MPH | \002Pressure\002: %msg.8%in | \002Clouds\002: %msg.9%% |  \002Rainfall\002: %msg.12%% | \002UV Index\002: %msg.10% | \002Observation time\002: %msg.11%"
 set black(weather.en.6) "\002Error\002: %msg.1%"
-set black(weather.en.7) "Sintaxis:Coloque \002%msg.1%clima ubicaciÃ³n,(m/f)\002 para obtener resultados."
-set black(weather.en.8) "\002%msg.1%\002: su ubicaciÃ³n por defecto ha sido guardada:\002 %msg.2%\002 en \002%msg.3%\002 la base de datos."
-set black(weather.en.9) "\002%msg.1%\002: no se encontro ninguna ubicaciÃ³n vinculada a tu nick. Para eso, use: \002%msg.2%clima <location,(m/f)>\002"
-set black(weather.en.10) "Sintaxis:Coloque \002%msg.1%clima ubicaciÃ³n\002 para ver el clima actual."
-set black(weather.en.11) "No se encontro ninguna ubicacion vinculada a: \002%msg.1%\002."
+set black(weather.en.7) "SYNTAX: \002%msg.1%w set <location,(m/f)>\002 to set one."
+set black(weather.en.8) "\002%msg.1%\002: your default location saved as:\002 %msg.2%\002 with \002%msg.3%\002 unit."
+set black(weather.en.9) "\002%msg.1%\002: no location found linked to your nick. To link one, use: \002%msg.2%w set <location,(m/f)>\002"
+set black(weather.en.10) "SYNTAX: \002%msg.1%w <location>\002 to get the live weather."
+set black(weather.en.11) "No location found linked to \002%msg.1%\002."
 set black(weather.en.version) "\002$weather(projectName) $weather(version)\002 coded by\002 $weather(author)\002 ($weather(email)) --\002 $weather(website)\002"
 
 putlog "\002$weather(projectName) $weather(version)\002 coded by\002 $weather(author)\002 ($weather(website)): Loaded & initialised.."
